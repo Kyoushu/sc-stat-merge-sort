@@ -9,3 +9,19 @@ services:
 
     AppBundle\:
         resource: '../../src/AppBundle/*'
+
+    PHPExcel:
+        class: PHPExcel
+
+    PHPExcel_IOFactory:
+        class: PHPExcel_IOFactory
+
+    PHPExcel_Reader_IReader:
+        class: PHPExcel_Reader_Excel2007
+        factory: ['PHPExcel_IOFactory', createReader]
+        arguments: ['Excel2007']
+
+    PHPExcel_Writer_IWriter:
+        class: PHPExcel_Writer_Excel2007
+        factory: ['PHPExcel_IOFactory', createWriter]
+        arguments: ['@PHPExcel', 'Excel2007']
