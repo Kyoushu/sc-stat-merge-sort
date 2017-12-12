@@ -25,3 +25,7 @@ services:
         class: PHPExcel_Writer_Excel2007
         factory: ['PHPExcel_IOFactory', createWriter]
         arguments: ['@PHPExcel', 'Excel2007']
+
+    AppBundle\DataProcessor\DataProcessorFactory:
+        arguments:
+            $tempDir: "%kernel.cache_dir%/data-processor"

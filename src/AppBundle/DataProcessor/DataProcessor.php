@@ -46,6 +46,11 @@ class DataProcessor
     protected $sortPidColumnName;
 
     /**
+     * @var bool|null
+     */
+    protected $debug;
+
+    /**
      * @param DataProcessorFactory $factory
      * @throws \PHPExcel_Reader_Exception
      */
@@ -58,6 +63,16 @@ class DataProcessor
     }
 
     /**
+     * @param bool|null $debug
+     * @return $this
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+        return $this;
+    }
+
+    /**
      * @throws DataProcessorException
      */
     protected function assertReady()
@@ -67,6 +82,9 @@ class DataProcessor
         }
         if($this->sortFilePath === null){
             throw new DataProcessorException(sprintf('Sort file path not specified in %s', static::class));
+        }
+        if(!file_exists($this->sortFilePath)){
+            throw new DataProcessorException(sprintf('%s does not exist', $this->sortFilePath));
         }
         if($this->sortMatchColumnName === null){
             throw new DataProcessorException(sprintf('Sort match column name not specified in %s', static::class));
@@ -203,6 +221,7 @@ class DataProcessor
 
     /**
      * @param array $sortData
+     * @param string $path
      */
     protected function validateSortData(array $sortData, $path)
     {
@@ -274,10 +293,48 @@ class DataProcessor
         });
     }
 
+    /**
+     * @param string $personFilePath
+     * @return string Path to generated CSV file
+     * @throws DataProcessorException
+     */
+    public function createSortedFile($personFilePath)
+    {
+        if(!file_exists($this->outputDir)){
+            mkdir($this->outputDir, 0777, true);
+        }
+
+        $outputDir = realpath($this->outputDir);
+        if(!file_exists($outputDir)){
+            throw new DataProcessorException(sprintf(
+                '%s could not be created',
+                $this->outputDir
+            ));
+        }
+
+        $baseName = basename($personFilePath);
+        $baseName = preg_replace('/\.[^\.]+$/', '', $baseName);
+
+        $filename = sprintf('%s_sorted.csv', $baseName);
+        $path = sprintf('%s/%s', $outputDir, $filename);
+
+        if(file_exists($path)) unlink($path);
+
+        $sortedData = $this->createSortedData($personFilePath);
+        $header = array_keys($sortedData[0]);
+
+        $handle = fopen($path, 'w');
+        fputcsv($handle, $header);
+        foreach($sortedData as $columns){
+            fputcsv($handle, array_values($columns));
+        }
+        fclose($handle);
+
+        return $path;
+    }
+
     public function createSortedData($personFilePath)
     {
-
-
         $this->assertReady();
 
         $personData = $this->loadExcelData($personFilePath);
@@ -302,28 +359,32 @@ class DataProcessor
                 if($sortPid !== $pid) continue;
                 if($sortMatchValue !== $matchValue) continue;
 
-                $debugData = [
-                    'sort' => [
-                        'pid_column' => $this->sortPidColumnName,
-                        'match_column' => $this->sortMatchColumnName,
-                        'match_value' => $sortMatchValue,
-                        'row' => $sortRow,
-                        'index' => $sortIndex
-                    ],
-                    'person' => [
-                        'pid' => $pid,
-                        'match_column' => $this->personMatchColumnName,
-                        'match_value' => $matchValue,
-                        'row' => $row
-                    ]
+                $extraColumns = [
+                    self::COLUMN_NAME_SORT => $sortIndex
                 ];
+
+                if($this->debug){
+                    $debugData = [
+                        'sort' => [
+                            'pid_column' => $this->sortPidColumnName,
+                            'match_column' => $this->sortMatchColumnName,
+                            'match_value' => $sortMatchValue,
+                            'row' => $sortRow,
+                            'index' => $sortIndex
+                        ],
+                        'person' => [
+                            'pid' => $pid,
+                            'match_column' => $this->personMatchColumnName,
+                            'match_value' => $matchValue,
+                            'row' => $row
+                        ]
+                    ];
+                    $extraColumns[self::COLUMN_NAME_DEBUG] = json_encode($debugData);
+                }
 
                 return array_merge(
                     $columns,
-                    [
-                        self::COLUMN_NAME_SORT => $sortIndex,
-                        self::COLUMN_NAME_DEBUG => json_encode($debugData)
-                    ]
+                    $extraColumns
                 );
 
             }
