@@ -74,7 +74,6 @@ class DataProcessorTest extends TestCase
         $this->assertEquals('PID3_C', $data[0]['ExampleData']);
         $this->assertEquals('PID3_B', $data[1]['ExampleData']);
         $this->assertEquals('PID3_A', $data[2]['ExampleData']);
-
     }
 
 }
