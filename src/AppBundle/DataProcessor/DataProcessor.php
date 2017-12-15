@@ -172,7 +172,7 @@ class DataProcessor
             $reader = \PHPExcel_IOFactory::createReader('Excel2007');
         }
         elseif(preg_match('/\.xls$/i', $path)){
-            $reader = \PHPExcel_IOFactory::createReader('Excel2003XML');
+            $reader = \PHPExcel_IOFactory::createReader('Excel5');
         }
         else{
             throw new DataProcessorException('Unsupported file format');
