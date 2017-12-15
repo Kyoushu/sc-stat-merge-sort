@@ -55,7 +55,7 @@ class ProcessCommand extends AbstractCommand
 
         $processor->setDebug($debug);
 
-        $finder = Finder::create()->files()->in($peopleDir)->name('/\.xlsx/i');
+        $finder = Finder::create()->files()->in($peopleDir)->name('/\.xlsx?/i');
 
         if($finder->count() === 0){
             throw new DataProcessorException(sprintf(
