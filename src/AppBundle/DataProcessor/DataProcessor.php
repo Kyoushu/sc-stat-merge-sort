@@ -10,6 +10,8 @@ class DataProcessor
     const COLUMN_NAME_SORT = '_sort';
     const COLUMN_NAME_DEBUG = '_debug';
 
+    const MATCH_PRECISION = 2;
+
     /**
      * @var DataProcessorFactory
      */
@@ -367,7 +369,7 @@ class DataProcessor
                 $sortMatchValue = $sortColumns[$this->sortMatchColumnName];
 
                 if($sortPid !== $pid) continue;
-                if($sortMatchValue !== $matchValue) continue;
+                if(round($sortMatchValue, self::MATCH_PRECISION) !== round($matchValue, self::MATCH_PRECISION)) continue;
 
                 $extraColumns = [
                     self::COLUMN_NAME_SORT => $sortIndex
