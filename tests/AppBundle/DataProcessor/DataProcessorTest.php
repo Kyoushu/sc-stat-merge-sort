@@ -64,7 +64,7 @@ class DataProcessorTest extends TestCase
         $this->assertEquals('PID1_A', $data[0]['ExampleData']);
         $this->assertEquals('PID1_B', $data[1]['ExampleData']);
 
-        $data = $processor->createSortedData(__DIR__ . '/../Resources/sample_data/people/pid2.xlsx');
+        $data = $processor->createSortedData(__DIR__ . '/../Resources/sample_data/people/ASJHDGJHASGDJH_ppt2.xlsx');
         $this->assertCount(2, $data);
         $this->assertEquals('PID2_B', $data[0]['ExampleData']);
         $this->assertEquals('PID2_A', $data[1]['ExampleData']);

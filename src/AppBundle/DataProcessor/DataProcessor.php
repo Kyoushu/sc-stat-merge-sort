@@ -200,7 +200,7 @@ class DataProcessor
     public static function resolvePersonFilePid($personFilePath)
     {
         $filename = basename($personFilePath);
-        if(!preg_match('/pid(?<pid>[0-9]+)/i', $filename, $match)){
+        if(!preg_match('/(pid|ppt)(?<pid>[0-9]+)/i', $filename, $match)){
             throw new DataProcessorException(sprintf(
                 'Could not determine PID for %s',
                 $personFilePath
