@@ -168,7 +168,17 @@ class DataProcessor
 
     public function loadExcelData($path)
     {
-        $excel = $this->reader->load($path);
+        if(preg_match('/\.xlsx$/i', $path)){
+            $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+        }
+        elseif(preg_match('/\.xls$/i', $path)){
+            $reader = \PHPExcel_IOFactory::createReader('Excel2003XML');
+        }
+        else{
+            throw new DataProcessorException('Unsupported file format');
+        }
+
+        $excel = $reader->load($path);
 
         $data = [];
 
