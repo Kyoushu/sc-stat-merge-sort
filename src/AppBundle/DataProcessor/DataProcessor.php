@@ -28,11 +28,6 @@ class DataProcessor
     protected $outputDir;
 
     /**
-     * @var \PHPExcel_Reader_IReader
-     */
-    protected $reader;
-
-    /**
      * @var string|null
      */
     protected $sortMatchColumnName;
@@ -54,11 +49,9 @@ class DataProcessor
 
     /**
      * @param DataProcessorFactory $factory
-     * @throws \PHPExcel_Reader_Exception
      */
     public function __construct(DataProcessorFactory $factory)
     {
-        $this->reader = \PHPExcel_IOFactory::createReader('Excel2007');
         $this->factory = $factory;
 
         $this->outputDir = $this->factory->getTempDir() . '/output';
